@@ -2,3 +2,4 @@ Flask
 gunicorn
 APScheduler
 requests
+google-generativeai
