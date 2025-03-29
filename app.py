@@ -1,5 +1,5 @@
 import requests
-from flask import Flask
+from flask import Flask, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 import google.generativeai as genai
 import os
@@ -62,9 +62,8 @@ def ai_stuff():
     """)
 
     summary = response.text
-    print(summary)
 
-    return summary
+    return {"response": summary}
 
 
 
@@ -79,7 +78,7 @@ def health():
 def AI():
     gemini_answer = ai_stuff()
     
-    return gemini_answer, 200
+    return jsonify(gemini_answer), 200
 
 
 def ping_health():
