@@ -13,6 +13,10 @@ def health():
 # AI endpoint
 @app.route('/AI', methods=['GET'])
 def AI():
+    
+
+
+
     return "AI API is healthy!", 200
 
 
