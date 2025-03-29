@@ -86,11 +86,13 @@ def ping_health():
         response = requests.get("http://127.0.0.1:5000/health")
         if response.status_code != 200:
             print(f"Health check failed with status code: {response.status_code}")
+        else:
+            print(response.text)
     except requests.exceptions.RequestException as e:
         print(f"Error during health check: {e}")
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(ping_health, 'interval', seconds=840)
+scheduler.add_job(ping_health, 'interval', seconds=600)
 
 if __name__ == "__main__":
     scheduler.start()
