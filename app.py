@@ -7,6 +7,8 @@ import os
 app = Flask(__name__)
 genai.configure(api_key=os.environ["capstoneGemini"])
 
+rapid-api-key = os.getenv('RAPIDAPI_KEY')
+
 generation_config = {
   "temperature": 1,
   "top_p": 0.95,
