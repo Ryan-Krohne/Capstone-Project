@@ -60,7 +60,26 @@ def ai_stuff():
 
     return {"response": summary}
 
+def social_media_data():
 
+    #facebook
+    #https://rapidapi.com/ousema.frikha/api/facebook-pages-scraper2/playground/apiendpoint_81eac290-2e49-43c4-89ec-99f86338265a
+    #https://www.facebook.com/greenplanetfarms/
+
+    #insta
+    #https://rapidapi.com/allapiservice/api/real-time-instagram-scraper-api1/playground/apiendpoint_aea8f1b9-3ea7-4cc3-9796-8551248b30e7
+    #https://www.instagram.com/futureacresfarm/
+
+
+    #tiktok
+    #https://rapidapi.com/Lundehund/api/tiktok-api23/playground/apiendpoint_c1dca90d-a452-4ec8-9ac8-5d6fe43c9d62
+    #https://www.tiktok.com/@future.acres.farm
+
+
+    #linkedin
+    
+
+    return None
 
 # Health endpoint
 @app.route('/health', methods=['GET'])
