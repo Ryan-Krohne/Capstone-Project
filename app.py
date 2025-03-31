@@ -26,38 +26,33 @@ def ai_stuff():
     chat_session = model.start_chat()
         
     response = chat_session.send_message(f"""
-    You are an AI assistant designed to help Dave understand his social media performance. Based on the following statistics, generate a friendly and informative message that explains the key metrics and provides insights.
+    You are an AI assistant designed to help Dave understand his social media performance. Based on the following statistics, generate a friendly and informative message that explains the key metrics and provides a summary blurb.
 
     ### Social Media Statistics:
-    - Total Followers: 15,432
-    - Total Likes: 98,543
-    - Total Comments: 4,123
-    - Engagement Rate: 3.5%
-    - Total Shares: 1,278
-    - Average Post Reach: 7,896
-    - Top Performing Post: "Our latest product launch went viral, reaching 50,000+ people!"
-    - Week-over-Week Growth: +2.3% in followers
-    - Top Demographics: 60% Female, 40% Male, Most active age group: 25-34
+    - Total Engagements this Week: 543
+    - Facebook Likes this Week: 210
+    - Facebook Comments this Week: 35
+    - X Likes this Week: 150
+    - X Comments this Week: 20
+    - Instagram Likes this Week: 100
+    - Instagram Comments this Week: 28
 
     ### Request:
-    Generate a message that highlights these statistics in a way that is easy to understand and insightful for the client. The message should:
-    - Acknowledge key achievements (e.g., follower growth, top-performing posts)
-    - Mention the engagement rate and provide a brief explanation of its significance
-    - Provide insights into the client’s audience demographics
-    - Suggest areas for improvement or focus, if applicable
+    Generate a message that highlights these statistics in a clear and concise format. The message should:
+    - Clearly list the total engagements and the specific platform engagement metrics for Facebook, X (formerly Twitter), and Instagram.
+    - Provide a brief summary blurb that offers a general overview or insight based on the provided data.
 
-    The tone should be friendly, professional, and encouraging.
+    The tone should be professional and informative.
 
-    ### Example output structure:
-    "Hi Dave, here's an update on your social media performance:
-
-    - Your total followers have increased to 15,432, with a week-over-week growth of +2.3%!
-    - Your engagement rate of 3.5% is great, indicating strong interaction with your audience.
-    - The post on [date] about your product launch performed exceptionally well, reaching 50,000+ people!
-    - Your top demographic is 25-34-year-olds, with 60% of your audience being female.
-
-    Keep up the great work! To further improve, you may want to focus on increasing the number of shares and engaging your male audience more. 
-    Keep an eye on the upcoming trends and continue to create content that resonates with your followers!"
+    ### Expected output structure:
+    "Total Engagements this Week: ###
+    Facebook Likes this Week: ###
+    Facebook Comments this Week: ###
+    X Likes this Week: ###
+    X Comments this Week: ###
+    Instagram Likes this Week: ###
+    Instagram Comments this Week: ###
+    Summary Blurb: ......."
 
     """)
 
