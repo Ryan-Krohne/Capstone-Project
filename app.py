@@ -3,11 +3,13 @@ from flask import Flask, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 import google.generativeai as genai
 import os
+import json
 
 app = Flask(__name__)
 genai.configure(api_key=os.environ["capstoneGemini"])
 
-rapid-api-key = os.getenv('RAPIDAPI_KEY')
+rapid_api_key = os.getenv('RAPIDAPI_KEY')
+
 
 generation_config = {
   "temperature": 1,
@@ -68,6 +70,30 @@ def social_media_data():
     #https://rapidapi.com/ousema.frikha/api/facebook-pages-scraper2/playground/apiendpoint_81eac290-2e49-43c4-89ec-99f86338265a
     #https://www.facebook.com/greenplanetfarms/
 
+
+    url = "https://facebook-pages-scraper2.p.rapidapi.com/get_facebook_pages_details"
+
+    querystring = {"link":"https://www.facebook.com/greenplanetfarms"}
+
+    headers = {
+        "x-rapidapi-key": rapid_api_key,
+        "x-rapidapi-host": "facebook-pages-scraper2.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers, params=querystring)
+
+    # Ensure the request was successful
+    if response.status_code == 200:
+        data = response.json()  # Convert API response to JSON
+        if data and isinstance(data, list):  # Ensure data is a list
+            followers = data[0].get('followers_count', 'N/A')
+            likes = data[0].get('likes_count', 'N/A')
+            print(f"Followers: {followers}, Likes: {likes}")
+        else:
+            print("Unexpected JSON format:", data)
+    else:
+        print(f"Error: {response.status_code}, {response.text}")
+
     #insta
     #https://rapidapi.com/allapiservice/api/real-time-instagram-scraper-api1/playground/apiendpoint_aea8f1b9-3ea7-4cc3-9796-8551248b30e7
     #https://www.instagram.com/futureacresfarm/
@@ -81,7 +107,9 @@ def social_media_data():
     #linkedin
     
 
-    return None
+    #youtube?
+
+    return response
 
 # Health endpoint
 @app.route('/health', methods=['GET'])
@@ -96,6 +124,16 @@ def AI():
     
     return jsonify(gemini_answer), 200
 
+
+
+
+@app.route('/testing', methods=['GET'])
+def testing():
+
+    x=social_media_data()
+    return "hi"
+    
+    
 
 def ping_health():
     try:
