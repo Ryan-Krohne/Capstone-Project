@@ -88,15 +88,40 @@ def social_media_data():
         if data and isinstance(data, list):  # Ensure data is a list
             followers = data[0].get('followers_count', 'N/A')
             likes = data[0].get('likes_count', 'N/A')
-            print(f"Followers: {followers}, Likes: {likes}")
+            print(f"-Facebook\nFollowers: {followers}, Likes: {likes}\n\n")
         else:
             print("Unexpected JSON format:", data)
     else:
         print(f"Error: {response.status_code}, {response.text}")
 
+
     #insta
     #https://rapidapi.com/allapiservice/api/real-time-instagram-scraper-api1/playground/apiendpoint_aea8f1b9-3ea7-4cc3-9796-8551248b30e7
     #https://www.instagram.com/futureacresfarm/
+
+
+    url = "https://real-time-instagram-scraper-api1.p.rapidapi.com/v1/user_info"
+
+    querystring = {"username_or_id":"futureacresfarm"}
+
+    headers = {
+        "x-rapidapi-key": rapid_api_key,
+        "x-rapidapi-host": "real-time-instagram-scraper-api1.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers, params=querystring)
+
+    if response.status_code == 200:
+        data = response.json()  # Convert API response to JSON
+        if data:  # Ensure data is a list
+            print("HERE\n\n\n")
+            followers = data["data"].get('follower_count', 'N/A')
+            media_count = data["data"].get('media_count', 'N/A')
+            print(f"-Instagram\nFollowers: {followers}, Media Count: {media_count}\n\n")
+        else:
+            print("Unexpected JSON format:")
+    else:
+        print(f"Error: {response.status_code}, {response.text}")
 
 
     #tiktok
