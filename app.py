@@ -3,7 +3,6 @@ from flask import Flask, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 import google.generativeai as genai
 import os
-import json
 
 app = Flask(__name__)
 genai.configure(api_key=os.environ["capstoneGemini"])
