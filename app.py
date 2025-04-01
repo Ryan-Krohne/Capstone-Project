@@ -114,7 +114,6 @@ def social_media_data():
     if response.status_code == 200:
         data = response.json()  # Convert API response to JSON
         if data:  # Ensure data is a list
-            print("HERE\n\n\n")
             followers = data["data"].get('follower_count', 'N/A')
             media_count = data["data"].get('media_count', 'N/A')
             print(f"-Instagram\nFollowers: {followers}, Media Count: {media_count}\n\n")
@@ -127,6 +126,32 @@ def social_media_data():
     #tiktok
     #https://rapidapi.com/Lundehund/api/tiktok-api23/playground/apiendpoint_c1dca90d-a452-4ec8-9ac8-5d6fe43c9d62
     #https://www.tiktok.com/@future.acres.farm
+
+    url = "https://tiktok-api23.p.rapidapi.com/api/user/info"
+
+    querystring = {"uniqueId":"future.acres.farm"}
+
+    headers = {
+        "x-rapidapi-key": rapid_api_key,
+        "x-rapidapi-host": "tiktok-api23.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers, params=querystring)
+
+    if response.status_code == 200:
+        data = response.json()  # Convert API response to JSON
+        if data:
+            followers = data["userInfo"]["stats"].get('followerCount', 'N/A')
+            heart_Count = data["userInfo"]["stats"].get('heartCount', 'N/A')
+            print(f"-Tiktok\nFollowers: {followers}, Likes: {heart_Count}\n\n")
+        else:
+            print("Unexpected JSON format:")
+    else:
+        print(f"Error: {response.status_code}, {response.text}")
+
+
+
+
 
 
     #linkedin
