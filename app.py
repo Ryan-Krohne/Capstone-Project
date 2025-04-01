@@ -180,8 +180,8 @@ def AI():
     return jsonify(gemini_answer), 200
 
 
-@app.route('/testing', methods=['GET'])
-def testing():
+@app.route('/data', methods=['GET'])
+def data():
 
     data = social_media_data()
     return jsonify(data) 
