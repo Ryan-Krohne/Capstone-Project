@@ -64,11 +64,11 @@ def ai_stuff():
     return {"response": summary}
 
 def social_media_data():
+    social_data = {}
 
     #facebook
     #https://rapidapi.com/ousema.frikha/api/facebook-pages-scraper2/playground/apiendpoint_81eac290-2e49-43c4-89ec-99f86338265a
     #https://www.facebook.com/greenplanetfarms/
-
 
     url = "https://facebook-pages-scraper2.p.rapidapi.com/get_facebook_pages_details"
 
@@ -81,76 +81,60 @@ def social_media_data():
 
     response = requests.get(url, headers=headers, params=querystring)
 
-    # Ensure the request was successful
     if response.status_code == 200:
-        data = response.json()  # Convert API response to JSON
-        if data and isinstance(data, list):  # Ensure data is a list
-            followers = data[0].get('followers_count', 'N/A')
-            likes = data[0].get('likes_count', 'N/A')
-            print(f"-Facebook\nFollowers: {followers}, Likes: {likes}\n\n")
-        else:
-            print("Unexpected JSON format:", data)
+        data = response.json()
+        if data:
+            social_data["facebook"] = {
+                "followers": data[0].get('followers_count', 'N/A'),
+                "likes": data[0].get('likes_count', 'N/A')
+            }
     else:
-        print(f"Error: {response.status_code}, {response.text}")
-
+        social_data["facebook"] = ""
 
     #insta
     #https://rapidapi.com/allapiservice/api/real-time-instagram-scraper-api1/playground/apiendpoint_aea8f1b9-3ea7-4cc3-9796-8551248b30e7
     #https://www.instagram.com/futureacresfarm/
 
-
     url = "https://real-time-instagram-scraper-api1.p.rapidapi.com/v1/user_info"
-
     querystring = {"username_or_id":"futureacresfarm"}
-
     headers = {
         "x-rapidapi-key": rapid_api_key,
         "x-rapidapi-host": "real-time-instagram-scraper-api1.p.rapidapi.com"
     }
-
     response = requests.get(url, headers=headers, params=querystring)
 
     if response.status_code == 200:
-        data = response.json()  # Convert API response to JSON
-        if data:  # Ensure data is a list
-            followers = data["data"].get('follower_count', 'N/A')
-            media_count = data["data"].get('media_count', 'N/A')
-            print(f"-Instagram\nFollowers: {followers}, Media Count: {media_count}\n\n")
+        data = response.json()
+        if data:
+            social_data["instagram"] = {
+                "followers": data["data"].get('follower_count', 'N/A'),
+                "media_count": data["data"].get('media_count', 'N/A')
+            }
         else:
             print("Unexpected JSON format:")
     else:
-        print(f"Error: {response.status_code}, {response.text}")
-
+        social_data["instagram"] = ""
 
     #tiktok
     #https://rapidapi.com/Lundehund/api/tiktok-api23/playground/apiendpoint_c1dca90d-a452-4ec8-9ac8-5d6fe43c9d62
     #https://www.tiktok.com/@future.acres.farm
 
     url = "https://tiktok-api23.p.rapidapi.com/api/user/info"
-
     querystring = {"uniqueId":"future.acres.farm"}
-
     headers = {
         "x-rapidapi-key": rapid_api_key,
         "x-rapidapi-host": "tiktok-api23.p.rapidapi.com"
     }
-
     response = requests.get(url, headers=headers, params=querystring)
-
     if response.status_code == 200:
-        data = response.json()  # Convert API response to JSON
+        data = response.json()
         if data:
-            followers = data["userInfo"]["stats"].get('followerCount', 'N/A')
-            heart_Count = data["userInfo"]["stats"].get('heartCount', 'N/A')
-            print(f"-Tiktok\nFollowers: {followers}, Likes: {heart_Count}\n\n")
-        else:
-            print("Unexpected JSON format:")
+            social_data["tiktok"] = {
+                "followers": data["userInfo"]["stats"].get('followerCount', 'N/A'),
+                "likes": data["userInfo"]["stats"].get('heartCount', 'N/A')
+            }
     else:
-        print(f"Error: {response.status_code}, {response.text}")
-
-
-
-
+        social_data["tiktok"] = ""
 
 
     #linkedin
@@ -171,17 +155,16 @@ def social_media_data():
     if response.status_code == 200:
         data = response.json()
         if data:
-            follower_count = data["data"].get("follower_count", "No follower count found")
-            print(f"-Linkedin\nFollowers: {follower_count}")
-        else:
-            print("Unexpected JSON format:")
+            social_data["linkedin"] = {
+                "followers": data["data"].get("follower_count", "No follower count found")
+            }
     else:
-        print(f"Error: {response.status_code}, {response.text}")
+        social_data["linkedin"] = ""
     
 
     #youtube?
 
-    return response
+    return social_data
 
 # Health endpoint
 @app.route('/health', methods=['GET'])
@@ -197,13 +180,11 @@ def AI():
     return jsonify(gemini_answer), 200
 
 
-
-
 @app.route('/testing', methods=['GET'])
 def testing():
 
-    x=social_media_data()
-    return "hi"
+    data = social_media_data()
+    return jsonify(data) 
     
     
 
