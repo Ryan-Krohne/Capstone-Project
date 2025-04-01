@@ -155,6 +155,29 @@ def social_media_data():
 
 
     #linkedin
+    #https://rapidapi.com/freshdata-freshdata-default/api/fresh-linkedin-profile-data/playground/apiendpoint_f3214d12-9f90-42f6-a2fd-dc42547ba463
+    #dave-littere-a23791286
+
+    url = "https://fresh-linkedin-profile-data.p.rapidapi.com/get-linkedin-profile"
+
+    querystring = {"linkedin_url":"https://www.linkedin.com/in/dave-littere-a23791286/","include_skills":"false","include_certifications":"false","include_publications":"false","include_honors":"false","include_volunteers":"false","include_projects":"false","include_patents":"false","include_courses":"false","include_organizations":"false","include_profile_status":"false","include_company_public_url":"false"}
+
+    headers = {
+        "x-rapidapi-key": rapid_api_key,
+        "x-rapidapi-host": "fresh-linkedin-profile-data.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers, params=querystring)
+
+    if response.status_code == 200:
+        data = response.json()
+        if data:
+            follower_count = data["data"].get("follower_count", "No follower count found")
+            print(f"-Linkedin\nFollowers: {follower_count}")
+        else:
+            print("Unexpected JSON format:")
+    else:
+        print(f"Error: {response.status_code}, {response.text}")
     
 
     #youtube?
