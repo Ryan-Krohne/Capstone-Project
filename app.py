@@ -179,7 +179,7 @@ def AI():
 def data():
 
     data = social_media_data()
-    data["date"] = datetime.today().strftime("%-m/%-d/%Y")
+    data["date"] = datetime.datetime.today().strftime("%-m/%-d/%Y")
     return jsonify(data) 
     
     
