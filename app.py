@@ -156,7 +156,7 @@ def social_media_data():
     
 
     #youtube?
-
+    print(social_data)
     return social_data
 
 # Health endpoint
@@ -169,7 +169,6 @@ def health():
 @app.route('/AI', methods=['GET'])
 def AI():
     data= social_media_data()
-    print(data)
     gemini_answer = ai_stuff(data)
     
     return jsonify(gemini_answer), 200
