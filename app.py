@@ -23,39 +23,25 @@ model = genai.GenerativeModel(
   generation_config=generation_config,
 )
 
-
-def ai_stuff():
+#talks to Gemini model to summarize social media data
+def ai_stuff(data):
 
     chat_session = model.start_chat()
         
     response = chat_session.send_message(f"""
-    You are an AI assistant designed to help Dave understand his social media performance. Based on the following statistics, generate a friendly and informative message that explains the key metrics and provides a summary blurb.
-
-    ### Social Media Statistics:
-    - Total Engagements this Week: 543
-    - Facebook Likes this Week: 210
-    - Facebook Comments this Week: 35
-    - X Likes this Week: 150
-    - X Comments this Week: 20
-    - Instagram Likes this Week: 100
-    - Instagram Comments this Week: 28
+    You are an AI assistant designed to help Dave understand his social media performance
+    Based on the following statistics, generate a friendly and informative message that explains the key metrics and provides a summary blurb.
 
     ### Request:
     Generate a message that highlights these statistics in a clear and concise format. The message should:
-    - Clearly list the total engagements and the specific platform engagement metrics for Facebook, X (formerly Twitter), and Instagram.
+    - Clearly list the total engagements and the specific platform engagement metrics for different social media accounts
     - Provide a brief summary blurb that offers a general overview or insight based on the provided data.
+    - If certain Data is null/empty, you do not need to provide a summary for it.
 
-    The tone should be professional and informative.
+    The tone should be friendly and informative.
 
-    ### Expected output structure:
-    "Total Engagements this Week: ###
-    Facebook Likes this Week: ###
-    Facebook Comments this Week: ###
-    X Likes this Week: ###
-    X Comments this Week: ###
-    Instagram Likes this Week: ###
-    Instagram Comments this Week: ###
-    Summary Blurb: ......."
+    ### Social Media Statistics:
+    {data}
 
     """)
 
@@ -67,29 +53,35 @@ def social_media_data():
     social_data = {}
 
     #facebook
-    #https://rapidapi.com/ousema.frikha/api/facebook-pages-scraper2/playground/apiendpoint_81eac290-2e49-43c4-89ec-99f86338265a
+    #https://rapidapi.com/krasnoludkolo/api/facebook-scraper3/playground/apiendpoint_847dc586-dd05-4660-a838-128c872a1407
     #https://www.facebook.com/greenplanetfarms/
 
-    url = "https://facebook-pages-scraper2.p.rapidapi.com/get_facebook_pages_details"
+    url = "https://facebook-scraper3.p.rapidapi.com/page/details"
 
-    querystring = {"link":"https://www.facebook.com/greenplanetfarms"}
+    querystring = {"url":"https://www.facebook.com/greenplanetfarms/"}
 
     headers = {
         "x-rapidapi-key": rapid_api_key,
-        "x-rapidapi-host": "facebook-pages-scraper2.p.rapidapi.com"
+        "x-rapidapi-host": "facebook-scraper3.p.rapidapi.com"
     }
 
     response = requests.get(url, headers=headers, params=querystring)
 
     if response.status_code == 200:
         data = response.json()
-        if data:
+        if data and "results" in data:
+            results = data["results"]
             social_data["facebook"] = {
-                "followers": data[0].get('followers_count', 'N/A'),
-                "likes": data[0].get('likes_count', 'N/A')
+                "followers": results.get("followers", "N/A"),
+                "likes": results.get("likes", "N/A")
             }
+        else:
+            social_data["facebook"] = ""
     else:
         social_data["facebook"] = ""
+
+
+
 
     #insta
     #https://rapidapi.com/allapiservice/api/real-time-instagram-scraper-api1/playground/apiendpoint_aea8f1b9-3ea7-4cc3-9796-8551248b30e7
@@ -175,7 +167,9 @@ def health():
 # AI endpoint
 @app.route('/AI', methods=['GET'])
 def AI():
-    gemini_answer = ai_stuff()
+    data= social_media_data()
+    print(data)
+    gemini_answer = ai_stuff(data)
     
     return jsonify(gemini_answer), 200
 
