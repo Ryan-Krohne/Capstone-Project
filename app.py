@@ -185,7 +185,7 @@ def data():
 
 def ping_health():
     try:
-        response = requests.get("http://127.0.0.1:5000/health")
+        response = requests.get("https://capstone-project-w4bm.onrender.com/health")
         if response.status_code != 200:
             print(f"Health check failed with status code: {response.status_code}")
         else:
