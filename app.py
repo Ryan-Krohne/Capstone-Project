@@ -3,6 +3,7 @@ from flask import Flask, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 import google.generativeai as genai
 import os
+import datetime
 
 app = Flask(__name__)
 genai.configure(api_key=os.environ["capstoneGemini"])
@@ -178,6 +179,7 @@ def AI():
 def data():
 
     data = social_media_data()
+    data["date"] = datetime.today().strftime("%-m/%-d/%Y")
     return jsonify(data) 
     
     
