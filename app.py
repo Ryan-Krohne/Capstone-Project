@@ -4,6 +4,9 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import google.generativeai as genai
 import os
 import datetime
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 genai.configure(api_key=os.environ["capstoneGemini"])
@@ -158,6 +161,44 @@ def social_media_data():
     #youtube?
     print(social_data)
     return social_data
+
+def send_weekly_update():
+    sender_email = os.environ.get("SENDER_EMAIL")
+    sender_password = os.environ.get("SENDER_PASSWORD")
+    receiver_email = os.environ.get("RECEIVER_EMAIL")
+
+    today_date = datetime.datetime.today().strftime("%-m/%-d/%Y")
+
+    subject = f"Weekly Social Media Growth Update - Dave ({today_date})"
+    body = "Hey Dave, here are your weekly social media growth statistics:.\n\n" \
+           "- The George Mason University Capstone Team"
+
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+
+    if not sender_email or not sender_password or not receiver_email:
+        print("Error: One or more email environment variables not set.")
+        return
+
+    try:
+        message = MIMEMultipart()
+        message['From'] = sender_email
+        message['To'] = receiver_email
+        message['Subject'] = subject
+
+        message.attach(MIMEText(body, 'plain'))
+
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
+
+        print(f"Email sent successfully to {receiver_email}")
+
+    except Exception as e:
+        print(f"Error sending email: {e}")
 
 # Health endpoint
 @app.route('/health', methods=['GET'])
