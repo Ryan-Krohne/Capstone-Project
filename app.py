@@ -1,5 +1,5 @@
 import requests
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 import google.generativeai as genai
 import os
@@ -10,8 +10,11 @@ from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 genai.configure(api_key=os.environ["capstoneGemini"])
-
 rapid_api_key = os.getenv('RAPIDAPI_KEY')
+EMAIL_PASSWORD = os.getenv("EMAIL_API_PASSWORD")
+
+printed_on_sunday = False
+last_emailed_day = None
 
 
 generation_config = {
@@ -191,7 +194,8 @@ def social_media_data():
     print(social_data)
     return social_data
 
-def send_weekly_update():
+def send_weekly_update(data):
+    print("Sending Weekly Email!")
     sender_email = os.environ.get("SENDER_EMAIL")
     sender_password = os.environ.get("SENDER_PASSWORD")
     receiver_email = os.environ.get("RECEIVER_EMAIL")
@@ -199,7 +203,7 @@ def send_weekly_update():
     today_date = datetime.datetime.today().strftime("%-m/%-d/%Y")
 
     subject = f"Weekly Social Media Growth Update - Dave ({today_date})"
-    body = "Hey Dave, here are your weekly social media growth statistics:.\n\n" \
+    body = f"Hey Dave, here are your weekly social media growth statistics:.\n\n{data}," \
            "- The George Mason University Capstone Team"
 
     smtp_server = "smtp.gmail.com"
@@ -234,6 +238,24 @@ def send_weekly_update():
 def health():
     print("Health was pinged")
     return "API is healthy!", 200
+
+
+@app.route('/email', methods=['POST'])
+def trigger_weekly_email():
+    global printed_on_sunday
+    global last_emailed_day
+    now = datetime.datetime.now()
+    current_day = now.weekday()
+    provided_password = request.form.get('password')
+    print(provided_password)
+    print(EMAIL_PASSWORD)
+
+    if not provided_password or provided_password != EMAIL_PASSWORD:
+        return jsonify({"error": "Access Denied"}), 401
+    
+
+    send_weekly_update("This is test data")
+    return "Email Sent", 200
 
 # AI endpoint
 @app.route('/AI', methods=['GET'])
