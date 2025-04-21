@@ -203,7 +203,7 @@ def send_weekly_update(data):
     today_date = datetime.datetime.today().strftime("%-m/%-d/%Y")
 
     subject = f"Weekly Social Media Growth Update - Dave ({today_date})"
-    body = f"Hey Dave, here are your weekly social media growth statistics:.\n\n{data}," \
+    body = f"Hey Dave, here are your weekly social media growth statistics:\n\n{data}\n\n" \
            "- The George Mason University Capstone Team"
 
     smtp_server = "smtp.gmail.com"
