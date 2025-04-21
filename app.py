@@ -97,11 +97,11 @@ def social_media_data():
     #https://rapidapi.com/allapiservice/api/real-time-instagram-scraper-api1/playground/apiendpoint_aea8f1b9-3ea7-4cc3-9796-8551248b30e7
     #https://www.instagram.com/futureacresfarm/
 
-    url = "https://real-time-instagram-scraper-api1.p.rapidapi.com/v1/user_info"
-    querystring = {"username_or_id":"futureacresfarm"}
+    url = "https://instagram-social-api.p.rapidapi.com/v1/info"
+    querystring = {"username_or_id_or_url":"futureacresfarm"}
     headers = {
         "x-rapidapi-key": rapid_api_key,
-        "x-rapidapi-host": "real-time-instagram-scraper-api1.p.rapidapi.com"
+        "x-rapidapi-host": "instagram-social-api.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
 
