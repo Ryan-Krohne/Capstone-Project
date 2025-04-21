@@ -13,9 +13,9 @@ genai.configure(api_key=os.environ["capstoneGemini"])
 rapid_api_key = os.getenv('RAPIDAPI_KEY')
 EMAIL_PASSWORD = os.getenv("EMAIL_API_PASSWORD")
 
-printed_on_sunday = False
+already_sent_on_sunday = False
 last_emailed_day = None
-
+HEALTH_CHECK_URL = "http://127.0.0.1:5000/health"
 
 generation_config = {
   "temperature": 1,
@@ -234,21 +234,29 @@ def send_weekly_update(data):
         print(f"Error sending email: {e}")
 
 # Health endpoint
-@app.route('/health', methods=['GET'])
+@app.route('/health', methods=['POST'])
 def health():
-    print("Health was pinged")
-    return "API is healthy!", 200
+    provided_password = request.form.get('password')
+
+    if not provided_password:
+        print("Health was pinged")
+        return "API is healthy!", 200
+
+    if provided_password != EMAIL_PASSWORD:
+        return jsonify({"error": "Access Denied"}), 401
+    else:
+        send_weekly_update("This is test data")
+        return "Email Sent", 200
 
 
-@app.route('/email', methods=['POST'])
+
+@app.route('/email_test', methods=['POST'])
 def trigger_weekly_email():
-    global printed_on_sunday
+    global already_sent_on_sunday
     global last_emailed_day
     now = datetime.datetime.now()
     current_day = now.weekday()
     provided_password = request.form.get('password')
-    print(provided_password)
-    print(EMAIL_PASSWORD)
 
     if not provided_password or provided_password != EMAIL_PASSWORD:
         return jsonify({"error": "Access Denied"}), 401
@@ -276,12 +284,51 @@ def data():
     
 
 def ping_health():
+    global already_sent_on_sunday
+    global last_emailed_day
+    data = {'password': EMAIL_PASSWORD}
+    now = datetime.datetime.now()
+    current_day = now.weekday()
+    
     try:
-        response = requests.get("https://capstone-project-w4bm.onrender.com/health")
-        if response.status_code != 200:
-            print(f"Health check failed with status code: {response.status_code}")
+        if current_day == 6:  # It's Sunday
+            if not already_sent_on_sunday or last_check_day != current_day:
+                if EMAIL_PASSWORD:
+                    try:
+                        data = {'password': EMAIL_PASSWORD}
+                        response = requests.post(HEALTH_CHECK_URL, data=data)
+                        if response.status_code == 200:
+                            print("Email sent successfully via health check.")
+                            already_sent_on_sunday = True
+                            last_check_day = current_day
+                        elif response.status_code != 200:
+                            print(f"Health check (with email trigger) failed with status code: {response.status_code}")
+                        else:
+                            print(f"Health check responded: {response.text}")
+                    except requests.exceptions.RequestException as e:
+                        print(f"Error during health check (with email trigger): {e}")
+                else:
+                    print("EMAIL_PASSWORD not configured, skipping email trigger.")
+            else:
+                print("Already sent email today (Sunday).")
+                try:
+                    response = requests.post(HEALTH_CHECK_URL) # Still ping for health
+                    if response.status_code != 200:
+                        print(f"Regular health check failed: {response.status_code}")
+                    else:
+                        print(response.text)
+                except requests.exceptions.RequestException as e:
+                    print(f"Error during regular health check: {e}")
         else:
-            print(response.text)
+            already_sent_on_sunday = False
+            try:
+                response = requests.post(HEALTH_CHECK_URL)
+                if response.status_code != 200:
+                    print(f"Regular health check failed: {response.status_code}")
+                else:
+                    print(response.text)
+            except requests.exceptions.RequestException as e:
+                print(f"Error during regular health check: {e}")
     except requests.exceptions.RequestException as e:
         print(f"Error during health check: {e}")
 
