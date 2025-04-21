@@ -80,9 +80,15 @@ def social_media_data():
                 "likes": results.get("likes", "N/A")
             }
         else:
-            social_data["facebook"] = ""
+            social_data["facebook"] = {
+            "followers":'0',
+            "likes": '0'
+        }
     else:
-        social_data["facebook"] = ""
+        social_data["facebook"] = {
+            "followers":'0',
+            "likes": '0'
+        }
 
 
 
@@ -107,9 +113,15 @@ def social_media_data():
                 "media_count": data["data"].get('media_count', 'N/A')
             }
         else:
-            print("Unexpected JSON format:")
+            social_data["instagram"] = {
+                "followers":'0',
+                "media_count": '0'
+            }
     else:
-        social_data["instagram"] = ""
+        social_data["instagram"] = {
+            "followers":'0',
+            "media_count": '0'
+        }
 
     #tiktok
     #https://rapidapi.com/Lundehund/api/tiktok-api23/playground/apiendpoint_c1dca90d-a452-4ec8-9ac8-5d6fe43c9d62
@@ -129,8 +141,18 @@ def social_media_data():
                 "followers": data["userInfo"]["stats"].get('followerCount', 'N/A'),
                 "likes": data["userInfo"]["stats"].get('heartCount', 'N/A')
             }
+        else: 
+            social_data["tiktok"] = {
+                "followers":'0',
+                "likes": '0'
+            }
+
     else:
-        social_data["tiktok"] = ""
+        social_data["tiktok"] = {
+            "followers":'0',
+            "likes": '0'
+        }
+
 
 
     #linkedin
@@ -154,8 +176,15 @@ def social_media_data():
             social_data["linkedin"] = {
                 "followers": data["data"].get("follower_count", "No follower count found")
             }
+        else:
+            social_data["linkedin"] = {
+            "followers":"0"
+        }
+
     else:
-        social_data["linkedin"] = ""
+        social_data["linkedin"] = {
+            "followers":"0"
+        }
     
 
     #youtube?
