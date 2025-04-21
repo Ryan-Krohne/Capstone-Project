@@ -94,7 +94,7 @@ def social_media_data():
 
 
     #insta
-    #https://rapidapi.com/allapiservice/api/real-time-instagram-scraper-api1/playground/apiendpoint_aea8f1b9-3ea7-4cc3-9796-8551248b30e7
+    #https://rapidapi.com/social-lens-social-lens-default/api/instagram-social-api
     #https://www.instagram.com/futureacresfarm/
 
     url = "https://instagram-social-api.p.rapidapi.com/v1/info"
