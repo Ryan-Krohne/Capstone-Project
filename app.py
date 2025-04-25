@@ -351,4 +351,4 @@ scheduler.add_job(ping_health, 'interval', seconds=600)
 if __name__ == "__main__":
     scheduler.start()
     
-    app.run(debug=True)
+    app.run(debug=False)
