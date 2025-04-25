@@ -12,10 +12,11 @@ app = Flask(__name__)
 genai.configure(api_key=os.environ["capstoneGemini"])
 rapid_api_key = os.getenv('RAPIDAPI_KEY')
 EMAIL_PASSWORD = os.getenv("EMAIL_API_PASSWORD")
+HEALTH_CHECK_URL = os.getenv("CAPSTONE_HEALTH_URL")
 
 already_sent_on_sunday = False
 last_emailed_day = None
-HEALTH_CHECK_URL = os.getenv("CAPSTONE_HEALTH_URL")
+todays_data={}
 
 generation_config = {
   "temperature": 1,
@@ -189,8 +190,7 @@ def social_media_data():
             "followers":"0"
         }
     
-
-    #youtube?
+    social_data["date"] = datetime.datetime.today().strftime("%-m/%-d/%Y")
     print(social_data)
     return social_data
 
@@ -273,12 +273,16 @@ def AI():
 #This endpoint is called through the power automate workflow daily
 @app.route('/data', methods=['GET'])
 def data():
+    global todays_data
 
-    data = social_media_data()
-    data["date"] = datetime.datetime.today().strftime("%-m/%-d/%Y")
-    return jsonify(data) 
-    
-    
+    if not todays_data or todays_data["date"]!=datetime.datetime.today().strftime("%-m/%-d/%Y"):
+        print("fetched api")
+        data = social_media_data()
+        todays_data=data
+        return jsonify(data)
+    else:
+        print("did not fetch api")
+        return jsonify(todays_data)
 
 def ping_health():
     global already_sent_on_sunday
