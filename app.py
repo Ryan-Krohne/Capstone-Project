@@ -234,6 +234,7 @@ def send_weekly_update(data):
         print(f"Error sending email: {e}")
 
 # Health endpoint
+#If health is called and there's a password, it'll send the email (this will happen every sunday)
 @app.route('/health', methods=['POST'])
 def health():
     provided_password = request.form.get('password')
@@ -249,13 +250,9 @@ def health():
         return "Email Sent", 200
 
 
-
+#This is just a test for our demo
 @app.route('/email_test', methods=['POST'])
 def trigger_weekly_email():
-    global already_sent_on_sunday
-    global last_emailed_day
-    now = datetime.datetime.now()
-    current_day = now.weekday()
     provided_password = request.form.get('password')
 
     if not provided_password or provided_password != EMAIL_PASSWORD:
