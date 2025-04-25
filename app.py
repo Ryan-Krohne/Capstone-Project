@@ -15,7 +15,7 @@ EMAIL_PASSWORD = os.getenv("EMAIL_API_PASSWORD")
 
 already_sent_on_sunday = False
 last_emailed_day = None
-HEALTH_CHECK_URL = "http://127.0.0.1:5000/health"
+HEALTH_CHECK_URL = os.getenv("CAPSTONE_HEALTH_URL")
 
 generation_config = {
   "temperature": 1,
@@ -290,6 +290,8 @@ def ping_health():
     now = datetime.datetime.now()
     current_day = now.weekday()
     
+    #this is a normal health check
+    #if it's sunday and the email hasn't been sent yet, it will send it.
     try:
         if current_day == 6:  # It's Sunday
             if not already_sent_on_sunday or last_check_day != current_day:
