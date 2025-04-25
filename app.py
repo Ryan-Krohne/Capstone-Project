@@ -296,7 +296,7 @@ def read_word():
 
 @app.route('/update_word', methods=['POST'])
 def update_word():
-    """
+    """ 
     Updates the content of the 'test.txt' file with the word provided in the request.
     Handles various error scenarios and returns informative JSON responses.
     """
