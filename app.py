@@ -270,6 +270,16 @@ def AI():
     
     return jsonify(gemini_answer), 200
 
+
+#This is a testing function, I commented it out for now since it's not needed
+# @app.route('/update', methods=['POST'])
+# def update():
+#     global todays_data
+#     yesterday = datetime.date.today() - datetime.timedelta(days=1)
+#     todays_data["date"] = yesterday.strftime("%-m/%-d/%Y")
+#     return jsonify({"message": f"todays_data['date'] updated to {todays_data['date']}"}), 200
+
+
 #This endpoint is called through the power automate workflow daily
 @app.route('/data', methods=['GET'])
 def data():
