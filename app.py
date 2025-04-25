@@ -280,6 +280,20 @@ def AI():
 #     return jsonify({"message": f"todays_data['date'] updated to {todays_data['date']}"}), 200
 
 
+@app.route('/read_word', methods=['GET'])
+def read_word():
+    try:
+        with open('test.txt', 'r') as file:
+            word = file.readline().strip().split()[0]  # Read the first line, remove extra spaces, get the first word
+        if not word:  # Check if the file was empty
+            return jsonify({'error': 'File is empty'}), 400
+        return jsonify({'word': word}), 200
+    except FileNotFoundError:
+        return jsonify({'error': 'File not found'}), 404
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
+
+
 #This endpoint is called through the power automate workflow daily
 @app.route('/data', methods=['GET'])
 def data():
