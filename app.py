@@ -270,7 +270,7 @@ def AI():
     
     return jsonify(gemini_answer), 200
 
-
+#This endpoint is called through the power automate workflow daily
 @app.route('/data', methods=['GET'])
 def data():
 
