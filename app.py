@@ -294,6 +294,29 @@ def read_word():
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
 
 
+@app.route('/update_word', methods=['POST'])
+def update_word():
+    """
+    Updates the content of the 'test.txt' file with the word provided in the request.
+    Handles various error scenarios and returns informative JSON responses.
+    """
+    try:
+        data = request.get_json()  # Get JSON data from the request
+        if not data or 'word' not in data:
+            return jsonify({'error': 'Missing "word" in JSON request'}), 400  # Check for missing data
+        word = data['word']
+
+        if not isinstance(word, str):
+            return jsonify({'error': '"word" must be a string'}), 400
+
+        with open('test.txt', 'w') as file:
+            file.write(word)
+        return jsonify({'message': 'File successfully updated'}), 200
+    except FileNotFoundError:
+        return jsonify({'error': 'File not found'}), 404
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
+
 #This endpoint is called through the power automate workflow daily
 @app.route('/data', methods=['GET'])
 def data():
