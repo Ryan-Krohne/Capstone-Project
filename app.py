@@ -358,7 +358,7 @@ def health():
 @app.route('/test_get', methods=['GET'])
 def test_get():
     data = get_weekly_growth()
-    return "good"
+    return jsonify("good")
 
 
 # This is just a test for our demo
