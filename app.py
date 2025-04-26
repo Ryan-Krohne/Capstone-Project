@@ -355,11 +355,16 @@ def health():
         return "Email Sent", 200
 
 
+@app.route('/test_growth', methods=['GET'])
+def test_growth():
+    data = get_weekly_growth()
+    return jsonify(data)
+
+
 @app.route('/test_get', methods=['GET'])
 def test_get():
-    data = get_weekly_growth()
-    return jsonify("good")
-
+    data = call_get_data_api()
+    return jsonify(data)
 
 # This is just a test for our demo
 @app.route('/email_test', methods=['POST'])
