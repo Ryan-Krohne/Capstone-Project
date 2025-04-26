@@ -33,13 +33,14 @@ model = genai.GenerativeModel(
 )
 
 #talks to Gemini model to summarize social media data
-def ai_stuff(data):
-
+def gemini_summary(data):
     chat_session = model.start_chat()
         
     response = chat_session.send_message(f"""
-    You are an AI assistant designed to help Dave understand his social media performance
-    Based on the following statistics, generate a friendly and informative message that explains the key metrics and provides a summary blurb.
+    You are an AI assistant designed to determine social media growth.
+    Based on the following json statistics, generate a friendly and informative message that explains the key metrics and provides a summary blurb.
+    Keep it short, and use bullet points.
+    Do not have any introduction, we just need a short summary in bullet point format (5 lines max)
 
     ### Request:
     Generate a message that highlights these statistics in a clear and concise format. The message should:
@@ -48,6 +49,16 @@ def ai_stuff(data):
     - If certain Data is null/empty, you do not need to provide a summary for it.
 
     The tone should be friendly and informative.
+                                         
+    Example:
+                                         
+    Facebook:\n
+        - Followers grew by X (+Y%)
+        - Likes grew by X (+Y%)
+    Instagram:\n
+        - Followers grew by X (+Y%)
+        - Media count grew by X (+Y%).
+    etc.
 
     ### Social Media Statistics:
     {data}
@@ -56,87 +67,89 @@ def ai_stuff(data):
 
     summary = response.text
 
-    return {"response": summary}
+    return summary
 
-def weekly_growth_data():
-    global todays_data
+def get_weekly_growth():
+    last_week = call_get_data_api()  # Get last week's data
+    today = todays_data  # Get today's data (presumably already defined somewhere)
 
-    #need to change the url to other server
+    # Define platforms and their respective stats
+    platforms = {
+        'facebook': ['followers', 'likes'],
+        'instagram': ['followers', 'media_count'],
+        'linkedin': ['followers'],
+        'tiktok': ['followers', 'likes']
+    }
+
+    growth = {}
+
+    # Loop through each platform
+    for platform, stats in platforms.items():
+        platform_growth = {}
+
+        # Loop through each stat for the current platform
+        for stat in stats:
+            last_week_stat = last_week.get(platform, {}).get(stat, 0)
+            today_stat = today.get(platform, {}).get(stat, 0)
+
+            if last_week_stat != 0:  # Avoid division by zero
+                growth_value = today_stat - last_week_stat
+                growth_percentage = (growth_value / last_week_stat) * 100
+            else:
+                growth_value = today_stat
+                growth_percentage = 'N/A'  # In case there's no data from last week
+
+            platform_growth[stat] = {
+                'growth': growth_value,
+                'growth_percentage': growth_percentage
+            }
+
+        growth[platform] = platform_growth
+
+    print(growth)
+    return growth
+
+def call_get_data_api():
+    api_url = OTHER_SERVER_URL+"/get_data"
+    print(api_url)
+    
     try:
-        # 1. Get last week's data from API
-        response = requests.get(OTHER_SERVER_URL)
-        response.raise_for_status()
-        last_week_data = response.json()
-
-        # Error checking for the API response structure
-        if not isinstance(last_week_data, dict):
-            raise ValueError(f"Unexpected data format from {OTHER_SERVER_URL}: Expected a dictionary.")
-
-
-        # Error checking for today's data structure.
-        if not isinstance(todays_data, dict):
-            raise ValueError("Unexpected data format for today's data: Expected a dictionary.")
-
-        expected_platforms = ["facebook", "instagram", "linkedin", "tiktok"]
-        for platform in expected_platforms:
-            if platform not in todays_data:
-                raise ValueError(f"Missing platform '{platform}' in today's data.")
-            if not isinstance(todays_data[platform], dict):
-                raise ValueError(f"Expected {platform} data to be a dictionary.")
-
-        # 3. Compare the data and calculate growth/drop
-        results = {}
-        for platform in ["facebook", "instagram", "linkedin", "tiktok"]:
-            if platform not in last_week_data:
-                results[platform] = {"error": f"Platform '{platform}' not found in last week's data"}
-                continue
-
-            platform_results = {}
-            for metric in ["followers", "likes"]:  # Calculate for followers and likes
-                if metric in todays_data[platform]:
-                    today_value = todays_data[platform].get(metric, None)
-                    last_week_value = last_week_data[platform].get(metric, None)
-                    if today_value is not None and last_week_value is not None:
-                        if last_week_value == 0:
-                            if today_value == 0:
-                                growth_percentage = 0
-                            else:
-                                growth_percentage = float('inf')
-                        else:
-                            growth_percentage = ((today_value - last_week_value) / last_week_value) * 100
-                        platform_results[metric] = round(growth_percentage, 2)
-                    else:
-                         platform_results[metric] = None
-                
-                elif platform == "linkedin" and metric == "likes":
-                    platform_results[metric] = None
-                else:
-                    platform_results[metric] = {"error": f"Metric '{metric}' not found in today's data for platform '{platform}'"}
-            results[platform] = platform_results
-
-        return {
-            'report_date': datetime.now().strftime("%Y-%m-%d"),
-            'growth': results,
+        payload = {
+            'password': EMAIL_PASSWORD
         }
+    
+        response = requests.post(api_url, json=payload)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Request error: {e}")
+        return None
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return None
+    
+def call_update_data_api(new_data):
+    api_url = OTHER_SERVER_URL + "/update_data"
+
+    try:
+        payload = {
+            'password': EMAIL_PASSWORD,
+            'new_data': new_data
+        }
+
+        response = requests.post(api_url, json=payload)
+        response.raise_for_status()
+
+        # Return True if successful
+        return True
 
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching data from {OTHER_SERVER_URL}: {e}")
-        return {
-            'error': f"Failed to retrieve data from the API: {e}",
-            'report_date': datetime.now().strftime("%Y-%m-%d"),
-        }
-    except ValueError as e:
-        print(f"Error processing data: {e}")
-        return {
-            'error': f"Error processing data: {e}",
-            'report_date': datetime.now().strftime("%Y-%m-%d"),
-        }
+        print(f"Request error: {e}")
+        return False
+
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return {
-            'error': f"An unexpected error occurred: {e}",
-            'report_date': datetime.now().strftime("%Y-%m-%d"),
-        }
+        print(f"Unexpected error: {e}")
+        return False
 
 def social_media_data():
     social_data = {}
@@ -318,6 +331,7 @@ def send_weekly_update(data):
 # If health is called and there's a password, it'll send the email (this will happen every sunday)
 @app.route('/health', methods=['POST'])
 def health():
+    global todays_data
     provided_password = request.form.get('password')
 
     if not provided_password:
@@ -327,9 +341,13 @@ def health():
     if provided_password != EMAIL_PASSWORD:
         return jsonify({"error": "Access Denied"}), 401
     else:
-        data = weekly_growth_data()
-        updated_data = ai_stuff(data)
-        send_weekly_update(updated_data)
+        print("hit health email")
+        if not todays_data:
+            todays_data = social_media_data()
+        data = get_weekly_growth()
+        email_text = gemini_summary(data)
+        send_weekly_update(email_text)
+        call_update_data_api(todays_data)
         return "Email Sent", 200
 
 
@@ -342,16 +360,10 @@ def trigger_weekly_email():
         return jsonify({"error": "Access Denied"}), 401
     
 
-    send_weekly_update("This is test data")
+    data = get_weekly_growth()
+    email_text = gemini_summary(data)
+    send_weekly_update(email_text)
     return "Email Sent", 200
-
-# AI endpoint
-@app.route('/AI', methods=['GET'])
-def AI():
-    data= social_media_data()
-    gemini_answer = ai_stuff(data)
-    
-    return jsonify(gemini_answer), 200
 
 
 #This is a testing function, I commented it out for now since it's not needed
@@ -362,43 +374,6 @@ def AI():
 #     todays_data["date"] = yesterday.strftime("%-m/%-d/%Y")
 #     return jsonify({"message": f"todays_data['date'] updated to {todays_data['date']}"}), 200
 
-
-@app.route('/read_word', methods=['GET'])
-def read_word():
-    try:
-        with open('test.txt', 'r') as file:
-            word = file.readline().strip().split()[0]  # Read the first line, remove extra spaces, get the first word
-        if not word:  # Check if the file was empty
-            return jsonify({'error': 'File is empty'}), 400
-        return jsonify({'word': word}), 200
-    except FileNotFoundError:
-        return jsonify({'error': 'File not found'}), 404
-    except Exception as e:
-        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
-
-
-@app.route('/update_word', methods=['POST'])
-def update_word():
-    """ 
-    Updates the content of the 'test.txt' file with the word provided in the request.
-    Handles various error scenarios and returns informative JSON responses.
-    """
-    try:
-        data = request.get_json()  # Get JSON data from the request
-        if not data or 'word' not in data:
-            return jsonify({'error': 'Missing "word" in JSON request'}), 400  # Check for missing data
-        word = data['word']
-
-        if not isinstance(word, str):
-            return jsonify({'error': '"word" must be a string'}), 400
-
-        with open('test.txt', 'w') as file:
-            file.write(word)
-        return jsonify({'message': 'File successfully updated'}), 200
-    except FileNotFoundError:
-        return jsonify({'error': 'File not found'}), 404
-    except Exception as e:
-        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
 
 #This endpoint is called through the power automate workflow daily
 @app.route('/data', methods=['GET'])
