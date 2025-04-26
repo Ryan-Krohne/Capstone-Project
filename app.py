@@ -13,6 +13,7 @@ genai.configure(api_key=os.environ["capstoneGemini"])
 rapid_api_key = os.getenv('RAPIDAPI_KEY')
 EMAIL_PASSWORD = os.getenv("EMAIL_API_PASSWORD")
 HEALTH_CHECK_URL = os.getenv("CAPSTONE_HEALTH_URL")
+OTHER_SERVER_URL = os.getenv("OTHER_SERVER_URL")
 
 already_sent_on_sunday = False
 last_emailed_day = None
@@ -56,6 +57,87 @@ def ai_stuff(data):
     summary = response.text
 
     return {"response": summary}
+
+def weekly_growth_data():
+    global todays_data
+
+    #need to change the url to other server
+    local_api_url = OTHER_SERVER_URL
+    try:
+        # 1. Get last week's data from API
+        response = requests.get(local_api_url)
+        response.raise_for_status()
+        last_week_data = response.json()
+
+        # Error checking for the API response structure
+        if not isinstance(last_week_data, dict):
+            raise ValueError(f"Unexpected data format from {local_api_url}: Expected a dictionary.")
+
+
+        # Error checking for today's data structure.
+        if not isinstance(todays_data, dict):
+            raise ValueError("Unexpected data format for today's data: Expected a dictionary.")
+
+        expected_platforms = ["facebook", "instagram", "linkedin", "tiktok"]
+        for platform in expected_platforms:
+            if platform not in todays_data:
+                raise ValueError(f"Missing platform '{platform}' in today's data.")
+            if not isinstance(todays_data[platform], dict):
+                raise ValueError(f"Expected {platform} data to be a dictionary.")
+
+        # 3. Compare the data and calculate growth/drop
+        results = {}
+        for platform in ["facebook", "instagram", "linkedin", "tiktok"]:
+            if platform not in last_week_data:
+                results[platform] = {"error": f"Platform '{platform}' not found in last week's data"}
+                continue
+
+            platform_results = {}
+            for metric in ["followers", "likes"]:  # Calculate for followers and likes
+                if metric in todays_data[platform]:
+                    today_value = todays_data[platform].get(metric, None)
+                    last_week_value = last_week_data[platform].get(metric, None)
+                    if today_value is not None and last_week_value is not None:
+                        if last_week_value == 0:
+                            if today_value == 0:
+                                growth_percentage = 0
+                            else:
+                                growth_percentage = float('inf')
+                        else:
+                            growth_percentage = ((today_value - last_week_value) / last_week_value) * 100
+                        platform_results[metric] = round(growth_percentage, 2)
+                    else:
+                         platform_results[metric] = None
+                
+                elif platform == "linkedin" and metric == "likes":
+                    platform_results[metric] = None
+                else:
+                    platform_results[metric] = {"error": f"Metric '{metric}' not found in today's data for platform '{platform}'"}
+            results[platform] = platform_results
+
+        return {
+            'report_date': datetime.now().strftime("%Y-%m-%d"),
+            'growth': results,
+        }
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data from {local_api_url}: {e}")
+        return {
+            'error': f"Failed to retrieve data from the API: {e}",
+            'report_date': datetime.now().strftime("%Y-%m-%d"),
+        }
+    except ValueError as e:
+        print(f"Error processing data: {e}")
+        return {
+            'error': f"Error processing data: {e}",
+            'report_date': datetime.now().strftime("%Y-%m-%d"),
+        }
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return {
+            'error': f"An unexpected error occurred: {e}",
+            'report_date': datetime.now().strftime("%Y-%m-%d"),
+        }
 
 def social_media_data():
     social_data = {}
@@ -234,7 +316,7 @@ def send_weekly_update(data):
         print(f"Error sending email: {e}")
 
 # Health endpoint
-#If health is called and there's a password, it'll send the email (this will happen every sunday)
+# If health is called and there's a password, it'll send the email (this will happen every sunday)
 @app.route('/health', methods=['POST'])
 def health():
     provided_password = request.form.get('password')
@@ -246,11 +328,13 @@ def health():
     if provided_password != EMAIL_PASSWORD:
         return jsonify({"error": "Access Denied"}), 401
     else:
-        send_weekly_update("This is test data")
+        data = weekly_growth_data()
+        updated_data = ai_stuff(data)
+        send_weekly_update(updated_data)
         return "Email Sent", 200
 
 
-#This is just a test for our demo
+# This is just a test for our demo
 @app.route('/email_test', methods=['POST'])
 def trigger_weekly_email():
     provided_password = request.form.get('password')
@@ -339,7 +423,7 @@ def ping_health():
     current_day = now.weekday()
     
     #this is a normal health check
-    #if it's sunday and the email hasn't been sent yet, it will send it.
+    #if it's sunday and the email hasn't been sent yet, it will send an email.
     try:
         if current_day == 6:  # It's Sunday
             if not already_sent_on_sunday or last_check_day != current_day:
@@ -362,7 +446,7 @@ def ping_health():
             else:
                 print("Already sent email today (Sunday).")
                 try:
-                    response = requests.post(HEALTH_CHECK_URL) # Still ping for health
+                    response = requests.post(HEALTH_CHECK_URL)
                     if response.status_code != 200:
                         print(f"Regular health check failed: {response.status_code}")
                     else:
@@ -387,5 +471,4 @@ scheduler.add_job(ping_health, 'interval', seconds=600)
 
 if __name__ == "__main__":
     scheduler.start()
-    
     app.run(debug=False)
