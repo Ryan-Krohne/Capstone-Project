@@ -70,8 +70,12 @@ def gemini_summary(data):
     return summary
 
 def get_weekly_growth():
+    global todays_data
     last_week = call_get_data_api()  # Get last week's data
-    today = todays_data  # Get today's data (presumably already defined somewhere)
+    if not todays_data or todays_data["date"]!=datetime.datetime.today().strftime("%-m/%-d/%Y"):
+        print("fetched api")
+        todays_data = social_media_data()
+    today = todays_data
 
     # Define platforms and their respective stats
     platforms = {
