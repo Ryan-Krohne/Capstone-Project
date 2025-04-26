@@ -351,6 +351,12 @@ def health():
         return "Email Sent", 200
 
 
+@app.route('/test_get', methods=['GET'])
+def test_get():
+    data = get_weekly_growth()
+    return "good"
+
+
 # This is just a test for our demo
 @app.route('/email_test', methods=['POST'])
 def trigger_weekly_email():
@@ -363,7 +369,7 @@ def trigger_weekly_email():
     data = get_weekly_growth()
     email_text = gemini_summary(data)
     send_weekly_update(email_text)
-    return "Email Sent", 200
+    return jsonify({"message": "Email Sent"}), 200
 
 
 #This is a testing function, I commented it out for now since it's not needed
