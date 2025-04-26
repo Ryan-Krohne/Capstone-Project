@@ -62,16 +62,15 @@ def weekly_growth_data():
     global todays_data
 
     #need to change the url to other server
-    local_api_url = OTHER_SERVER_URL
     try:
         # 1. Get last week's data from API
-        response = requests.get(local_api_url)
+        response = requests.get(OTHER_SERVER_URL)
         response.raise_for_status()
         last_week_data = response.json()
 
         # Error checking for the API response structure
         if not isinstance(last_week_data, dict):
-            raise ValueError(f"Unexpected data format from {local_api_url}: Expected a dictionary.")
+            raise ValueError(f"Unexpected data format from {OTHER_SERVER_URL}: Expected a dictionary.")
 
 
         # Error checking for today's data structure.
@@ -121,7 +120,7 @@ def weekly_growth_data():
         }
 
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching data from {local_api_url}: {e}")
+        print(f"Error fetching data from {OTHER_SERVER_URL}: {e}")
         return {
             'error': f"Failed to retrieve data from the API: {e}",
             'report_date': datetime.now().strftime("%Y-%m-%d"),
@@ -468,7 +467,4 @@ def ping_health():
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(ping_health, 'interval', seconds=600)
-
-if __name__ == "__main__":
-    scheduler.start()
-    app.run(debug=False)
+scheduler.start()
