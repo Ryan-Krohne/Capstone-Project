@@ -15,7 +15,7 @@ EMAIL_PASSWORD = os.getenv("EMAIL_API_PASSWORD")
 HEALTH_CHECK_URL = os.getenv("CAPSTONE_HEALTH_URL")
 OTHER_SERVER_URL = os.getenv("OTHER_SERVER_URL")
 
-already_sent_on_sunday = False
+already_sent_on_sunday = True
 last_emailed_day = None
 todays_data={}
 
@@ -76,6 +76,9 @@ def get_weekly_growth():
         print("fetched api")
         todays_data = social_media_data()
     today = todays_data
+
+    print(todays_data)
+    print(last_week)
 
     # Define platforms and their respective stats
     platforms = {
