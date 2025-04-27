@@ -406,55 +406,45 @@ def data():
 
 def ping_health():
     global already_sent_on_sunday
-    global last_emailed_day
-    global last_check_day
-    data = {'password': EMAIL_PASSWORD}
+
     now = datetime.datetime.now()
     current_day = now.weekday()
-    
-    #this is a normal health check
-    #if it's sunday and the email hasn't been sent yet, it will send an email.
+
     try:
-        if current_day == 6:  # It's Sunday
-            if not already_sent_on_sunday or last_check_day != current_day:
+        if current_day == 6:  # Sunday
+            if not already_sent_on_sunday:
                 if EMAIL_PASSWORD:
                     try:
-                        data = {'password': EMAIL_PASSWORD}
-                        response = requests.post(HEALTH_CHECK_URL, data=data)
-                        if response.status_code == 200:
+                        # Send email
+                        email_response = requests.post(HEALTH_CHECK_URL, data={'password': EMAIL_PASSWORD})
+                        if email_response.status_code == 200:
                             print("Email sent successfully via health check.")
                             already_sent_on_sunday = True
-                            last_check_day = current_day
-                        elif response.status_code != 200:
-                            print(f"Health check (with email trigger) failed with status code: {response.status_code}")
                         else:
-                            print(f"Health check responded: {response.text}")
+                            print(f"Health check (with email trigger) failed: {email_response.status_code}")
                     except requests.exceptions.RequestException as e:
-                        print(f"Error during health check (with email trigger): {e}")
+                        print(f"Error during health check (email trigger): {e}")
                 else:
-                    print("EMAIL_PASSWORD not configured, skipping email trigger.")
+                    print("EMAIL_PASSWORD not configured. Skipping email trigger.")
             else:
                 print("Already sent email today (Sunday).")
-                try:
-                    response = requests.post(HEALTH_CHECK_URL)
-                    if response.status_code != 200:
-                        print(f"Regular health check failed: {response.status_code}")
-                    else:
-                        print(response.text)
-                except requests.exceptions.RequestException as e:
-                    print(f"Error during regular health check: {e}")
-        else:
+        
+        # Always send a regular health check
+        try:
+            health_response = requests.post(HEALTH_CHECK_URL)
+            if health_response.status_code != 200:
+                print(f"Regular health check failed: {health_response.status_code}")
+            else:
+                print(f"Health check OK: {health_response.text}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error during regular health check: {e}")
+
+        # Reset already_sent_on_sunday if it's not Sunday
+        if current_day != 6:
             already_sent_on_sunday = False
-            try:
-                response = requests.post(HEALTH_CHECK_URL)
-                if response.status_code != 200:
-                    print(f"Regular health check failed: {response.status_code}")
-                else:
-                    print(response.text)
-            except requests.exceptions.RequestException as e:
-                print(f"Error during regular health check: {e}")
-    except requests.exceptions.RequestException as e:
-        print(f"Error during health check: {e}")
+
+    except Exception as e:
+        print(f"Unexpected error during health check: {e}")
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(ping_health, 'interval', seconds=600)
