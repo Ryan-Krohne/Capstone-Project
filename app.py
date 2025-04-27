@@ -462,6 +462,11 @@ def ping_health():
     except Exception as e:
         print(f"Unexpected error during health check: {e}")
 
+
+if not todays_data or todays_data=={}:
+    print("getting social media data")
+    todays_data=social_media_data()
+    print("got social media data")
 scheduler = BackgroundScheduler()
 scheduler.add_job(ping_health, 'interval', seconds=600)
 scheduler.start()
