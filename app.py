@@ -58,7 +58,11 @@ def gemini_summary(data):
     Instagram:\n
         - Followers grew by X (+Y%)
         - Media count grew by X (+Y%).
-    etc.
+    Linkedin:\n
+        - Followers grew by X (+Y%)
+    Tiktok:\n
+        - Followers grew by X (+Y%)
+        - Likes grew by X (+Y%)
 
     ### Social Media Statistics:
     {data}
