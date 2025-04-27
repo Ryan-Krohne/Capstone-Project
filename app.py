@@ -39,7 +39,7 @@ def gemini_summary(data):
     response = chat_session.send_message(f"""
     You are an AI assistant designed to determine social media growth.
     Based on the following json statistics, generate a friendly and informative message that explains the key metrics and provides a summary blurb.
-    Keep it short, and use bullet points.
+    Keep it short, and use bullet points represented by hyphens.
     Do not have any introduction, we just need a short summary in bullet point format (5 lines max)
 
     ### Request:
@@ -49,6 +49,7 @@ def gemini_summary(data):
     - If certain Data is null/empty, you do not need to provide a summary for it.
 
     The tone should be friendly and informative.
+    Please do not include the asterisk symbol. Use hyphens (-) for bullet points.
                                          
     Example:
                                          
@@ -81,8 +82,14 @@ def get_weekly_growth():
         todays_data = social_media_data()
     today = todays_data
 
+    print(f"TODAYS DATA:\n")
     print(todays_data)
+    print("\n\n\n")
+
+
+    print(f"LAST WEEKS DATA:\n")
     print(last_week)
+    print("\n\n\n")
 
     # Define platforms and their respective stats
     platforms = {
@@ -122,7 +129,6 @@ def get_weekly_growth():
 
 def call_get_data_api():
     api_url = OTHER_SERVER_URL+"/get_data"
-    print(api_url)
     
     try:
         payload = {
@@ -384,7 +390,10 @@ def trigger_weekly_email():
 
     data = get_weekly_growth()
     email_text = gemini_summary(data)
+    print(email_text)
+    print("\n\n")
     send_weekly_update(email_text)
+    print(email_text)
     return jsonify({"message": "Email Sent"}), 200
 
 
