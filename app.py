@@ -407,6 +407,7 @@ def data():
 def ping_health():
     global already_sent_on_sunday
     global last_emailed_day
+    global last_check_day
     data = {'password': EMAIL_PASSWORD}
     now = datetime.datetime.now()
     current_day = now.weekday()
