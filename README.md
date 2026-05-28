@@ -1,36 +1,30 @@
-# Capstone Project – Social Media Analytics Backend
+# Social Media Analytics Backend (Senior Capstone)
 
-This repository contains the backend server built for my senior **Capstone Project**, a requirement for graduation. The project was completed in collaboration with a real-world sponsor, and it focuses on **automating social media tracking and reporting**.
+This repository houses the backend server for my senior capstone project. Developed in collaboration with a real-world sponsor, it solves a common administrative headache: **manually tracking and reporting social media growth**. 
 
-## 🎯 Project Overview
-
-The backend service is responsible for collecting and delivering weekly insights on our sponsor’s social media performance. It automates the process of tracking follower growth across platforms and integrates with SharePoint to present the data in a visual, user-friendly way.
+Instead of forcing team members to manually log in, check follower counts, and copy-paste metrics every week, this service automates the entire flow—from scraping the raw data to updating a SharePoint dashboard and emailing stakeholders.
 
 ## 🏆 Sponsor Testimonial
 
-Here is a 46-second message from our project sponsor sharing feedback on our work:
+Our project sponsor shared their feedback on what we built in this quick 46-second video:
 
 https://github.com/user-attachments/assets/e89a430a-cc5a-426e-8ebb-e2c8c7252aa7
 
-
 ## ⚙️ Key Features
 
-- **Social Media Scraper**: A Python-based scraper that pulls follower counts and other key metrics from our sponsor's social platforms.
-- **Weekly Email Reports**: Automatically sends an email summary of week-to-week social media growth to our sponsor via SMTP.
-- **Power Automate Integration**: A Power Automate workflow triggers this server weekly, retrieves updated metrics, and sends the data to SharePoint.
-- **SharePoint Dashboard**: The scraped data is displayed as a chart view in SharePoint, making it easy for stakeholders to review trends.
+- **Automated Scraping**: A Python script that crawls our sponsor's social channels to fetch up-to-date follower counts and performance metrics.
+- **Weekly Digests**: An automated SMTP email report sent straight to the sponsor, summarizing week-over-week growth.
+- **Power Automate Integration**: A weekly scheduled Power Automate flow that pings this server to trigger the scraping run and pull back the latest data.
+- **SharePoint Dashboard**: Feeds the scraped metrics directly into SharePoint to generate visual charts for easy trend analysis.
 
 ## 🛠️ Tech Stack
 
-- **Python** – for backend scripting and data scraping.
-- **SMTP** – for sending automated weekly reports.
-- **Microsoft Power Automate** – for scheduled execution and integration.
-- **Microsoft SharePoint** – for storing and visualizing the social media data.
-
-
-
-
+- **Python**: For backend logic and custom scraping scripts.
+- **Microsoft Power Automate**: For scheduling the weekly runs and orchestrating the data flow.
+- **Microsoft SharePoint**: Used as the database and frontend dashboard for stakeholders.
+- **SMTP**: For building and sending out the weekly email reports.
 
 ## 📦 Deployment
 
-The backend server is hosted externally and exposed via an endpoint that Power Automate calls on a weekly schedule. The server handles the entire data retrieval and delivery workflow from social media scraping to SharePoint integration.
+The server is hosted externally, exposing a single endpoint. Every week, Power Automate pings this endpoint to trigger the workflow. The backend then spins up, scrapes the platforms, updates the SharePoint records, and dispatches the weekly email summary.
+
