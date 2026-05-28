@@ -10,7 +10,8 @@ The backend service is responsible for collecting and delivering weekly insights
 
 Here is a 46-second message from our project sponsor sharing feedback on our work:
 
-<video src="dave_testimonial.mp4" width="100%" controls></video>
+https://github.com/user-attachments/assets/e89a430a-cc5a-426e-8ebb-e2c8c7252aa7
+
 
 ## ⚙️ Key Features
 
@@ -25,6 +26,10 @@ Here is a 46-second message from our project sponsor sharing feedback on our wor
 - **SMTP** – for sending automated weekly reports.
 - **Microsoft Power Automate** – for scheduled execution and integration.
 - **Microsoft SharePoint** – for storing and visualizing the social media data.
+
+
+
+
 
 ## 📦 Deployment
 
