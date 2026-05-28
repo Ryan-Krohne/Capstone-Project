@@ -6,6 +6,12 @@ This repository contains the backend server built for my senior **Capstone Proje
 
 The backend service is responsible for collecting and delivering weekly insights on our sponsor’s social media performance. It automates the process of tracking follower growth across platforms and integrates with SharePoint to present the data in a visual, user-friendly way.
 
+## 🏆 Sponsor Testimonial
+
+Here is a 46-second message from our project sponsor sharing feedback on our work:
+
+<video src="dave_testimonial.mp4" width="100%" controls></video>
+
 ## ⚙️ Key Features
 
 - **Social Media Scraper**: A Python-based scraper that pulls follower counts and other key metrics from our sponsor's social platforms.
